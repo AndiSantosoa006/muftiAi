@@ -5,12 +5,17 @@ import google.generativeai as genai
 
 app = FastAPI(title="API Maktabah Syamilah AI")
 
-API_KEY = "AIzaSyB9Sndz93NxtyQa3JFSBIDgvWcpc27jEXg" # Pastikan memasukkan API Key yang benar
+import os
+
+API_KEY = os.environ.get("GEMINI_API_KEY", "")
+if not API_KEY:
+    raise RuntimeError("GEMINI_API_KEY environment variable is not set!")
 genai.configure(api_key=API_KEY)
 
-# Konfigurasi Model: Gunakan 1.5-flash untuk performa penalaran terbaik
+# Konfigurasi Model
+MODEL_NAME = os.environ.get("GEMINI_MODEL_NAME", "gemini-2.0-flash-lite")
 generation_config = {"temperature": 0.3, "top_p": 0.9, "top_k": 40}
-model = genai.GenerativeModel(model_name='gemini-3.1-flash-lite', generation_config=generation_config)
+model = genai.GenerativeModel(model_name=MODEL_NAME, generation_config=generation_config)
 
 client = chromadb.PersistentClient(path="./referensi")
 koleksi_kitab = client.get_collection(name="koleksi_fikih_global")

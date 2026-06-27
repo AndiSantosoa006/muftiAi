@@ -1,0 +1,58 @@
+services:
+
+  # ============================================
+  # Python FastAPI Backend (AI + ChromaDB)
+  # ============================================
+  python-api:
+    build:
+      context: ./syamilahai
+      dockerfile: Dockerfile
+    container_name: mufti-python-api
+    ports:
+      - "8001:8001"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - GEMINI_MODEL_NAME=${GEMINI_MODEL_NAME:-gemini-2.0-flash-lite}
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - chroma-data:/app/referensi
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/docs"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+
+  # ============================================
+  # Laravel Web App (Frontend + API Gateway)
+  # ============================================
+  laravel-app:
+    build:
+      context: ./syamilah_web
+      dockerfile: Dockerfile
+    container_name: mufti-laravel-app
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_NAME=Mufti AI
+      - APP_ENV=production
+      - APP_DEBUG=false
+      - APP_URL=http://localhost:8000
+      - DB_CONNECTION=sqlite
+      - SESSION_DRIVER=file
+      - QUEUE_CONNECTION=sync
+      - CACHE_STORE=file
+      - MUFTI_API_URL=http://python-api:8001
+    depends_on:
+      python-api:
+        condition: service_started
+    restart: unless-stopped
+
+volumes:
+  chroma-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./syamilahai/referensi
+      o: bind

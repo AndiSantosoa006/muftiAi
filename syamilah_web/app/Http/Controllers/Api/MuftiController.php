@@ -17,9 +17,12 @@ class MuftiController extends Controller
 
         $pertanyaan = $request->input('pertanyaan');
 
+        // Di Docker: http://python-api:8001 (via .env), di lokal: http://127.0.0.1:8001
+        $muftiApiUrl = config('services.mufti.api_url');
+
         try {
-            // 2. Tembak API Python FastAPI (Pastikan server Python menyala di port 8001)
-            $response = Http::timeout(60)->post('http://127.0.0.1:8001/tanya-mufti', [
+            // 2. Tembak API Python FastAPI (Pastikan server Python menyala)
+            $response = Http::timeout(60)->post($muftiApiUrl . '/tanya-mufti', [
                 'pertanyaan' => $pertanyaan
             ]);
 

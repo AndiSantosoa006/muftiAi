@@ -35,4 +35,18 @@ return [
         ],
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Mufti AI Service
+    |--------------------------------------------------------------------------
+    |
+    | URL untuk backend Python FastAPI yang menjalankan AI Mufti.
+    | Di Docker: http://python-api:8001
+    | Di lokal:  http://127.0.0.1:8001
+    |
+    */
+    'mufti' => [
+        'api_url' => env('MUFTI_API_URL', 'http://127.0.0.1:8001'),
+    ],
+
 ];
